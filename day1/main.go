@@ -8,11 +8,8 @@ import (
 )
 
 func main() {
-	args := os.Args
-	if len(args) < 2 {
-		panic("missing input file path")
-	}
-	filepath := args[1]
+	GOPATH := os.Getenv("GOPATH")
+	filepath := GOPATH + "/src/github.com/harryganz/adventofcode/data/day1.txt"
 	input, err := utils.ScanFileToInts(filepath)
 	if err != nil {
 		panic(err)

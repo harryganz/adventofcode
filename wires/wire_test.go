@@ -92,6 +92,11 @@ func TestClosestIntersectionDistance(t *testing.T) {
 			[]string{"U62", "R66", "U55", "R34", "D71", "R55", "D58", "R83"},
 			159,
 		},
+		{
+			[]string{"R98", "U47", "R26", "D63", "R33", "U87", "L62", "D20", "R33", "U53", "R51"},
+			[]string{"U98", "R91", "D20", "R16", "D67", "R40", "U7", "R15", "U6", "R7"},
+			135,
+		},
 	}
 
 	for _, c := range table {
@@ -99,7 +104,8 @@ func TestClosestIntersectionDistance(t *testing.T) {
 		w2 := New()
 		w1.AddSegments(c.w1)
 		w2.AddSegments(c.w2)
-		got := ClosestIntersectionDistance(w1.GetIntersections(w2))
+		intersections := w1.GetIntersections(w2)
+		got := ClosestIntersectionDistance(intersections)
 		if c.expect != got {
 			t.Errorf("Did not get expected closest intersection. got: %d, expected: %d\n", got, c.expect)
 		}

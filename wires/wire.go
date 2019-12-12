@@ -1,6 +1,7 @@
 package wires
 
 import (
+	"math"
 	"strconv"
 )
 
@@ -109,18 +110,20 @@ func (w Wire) GetIntersections(o *Wire) map[int]map[int]int {
 // ClosestIntersectionDistance returns the closest intersection's distance
 // given a map of intersections
 func ClosestIntersectionDistance(intersections map[int]map[int]int) int {
-	minDistance := 0
+	var minDistance float64 = 0.0
 	for x, col := range intersections {
 		for y := range col {
 			if x != 0 && y != 0 {
-				if minDistance == 0 {
-					minDistance = x + y
-				} else if minDistance > (x + y) {
-					minDistance = x + y
+				absX := math.Abs(float64(x))
+				absY := math.Abs(float64(y))
+				if minDistance == 0.0 {
+					minDistance = absX + absY
+				} else if minDistance > (absX + absY) {
+					minDistance = absX + absY
 				}
 			}
 		}
 	}
 
-	return minDistance
+	return int(math.Floor(minDistance))
 }

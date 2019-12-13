@@ -11,6 +11,7 @@ type Wire struct {
 	coordinates map[int]map[int]int
 	endX        int
 	endY        int
+	endDist     int
 }
 
 // New creates a new wire object
@@ -18,10 +19,11 @@ func New() *Wire {
 	coords := make(map[int]map[int]int)
 	endX := 0
 	endY := 0
+	endDist := 0
 
 	coords[0] = make(map[int]int)
-	coords[0][0] = 1
-	return &Wire{coords, endX, endY}
+	coords[0][0] = 0
+	return &Wire{coords, endX, endY, endDist}
 }
 
 func parseSegment(segment string) (string, int) {
@@ -63,6 +65,7 @@ func (w *Wire) AddSegment(direction string, length int) {
 	}
 
 	for i := 0; i < length; i++ {
+		w.endDist++
 		if isHorizontal {
 			w.endX += sign
 		} else {
@@ -71,7 +74,7 @@ func (w *Wire) AddSegment(direction string, length int) {
 		if _, ok := w.coordinates[w.endX]; !ok {
 			w.coordinates[w.endX] = make(map[int]int)
 		}
-		w.coordinates[w.endX][w.endY] = 1
+		w.coordinates[w.endX][w.endY] = w.endDist
 	}
 }
 
@@ -86,7 +89,7 @@ func (w *Wire) AddSegments(s []string) {
 // IsAt returns true if wire has a segment
 // at x, y
 func (w Wire) IsAt(x, y int) bool {
-	return w.coordinates[x][y] == 1
+	return w.coordinates[x][y] != 0
 }
 
 // GetIntersections returns a map of all the points where
@@ -99,7 +102,7 @@ func (w Wire) GetIntersections(o *Wire) map[int]map[int]int {
 				if _, ok := result[x]; !ok {
 					result[x] = make(map[int]int)
 				}
-				result[x][y] = 1
+				result[x][y] = w.coordinates[x][y] + o.coordinates[x][y]
 			}
 		}
 	}
@@ -107,9 +110,9 @@ func (w Wire) GetIntersections(o *Wire) map[int]map[int]int {
 	return result
 }
 
-// ClosestIntersectionDistance returns the closest intersection's distance
+// ClosestIntersectionManhattan returns the closest intersection's distance
 // given a map of intersections
-func ClosestIntersectionDistance(intersections map[int]map[int]int) int {
+func ClosestIntersectionManhattan(intersections map[int]map[int]int) int {
 	var minDistance float64 = 0.0
 	for x, col := range intersections {
 		for y := range col {
@@ -126,4 +129,23 @@ func ClosestIntersectionDistance(intersections map[int]map[int]int) int {
 	}
 
 	return int(math.Floor(minDistance))
+}
+
+// ClosestIntersectionLinear returns the ditance to the intersection with the smallest combined
+// linear distance
+func ClosestIntersectionLinear(intersections map[int]map[int]int) int {
+	minDistance := 0
+	for x, col := range intersections {
+		for y := range col {
+			if x != 0 && y != 0 {
+				if minDistance == 0 {
+					minDistance = intersections[x][y]
+				} else if minDistance > intersections[x][y] {
+					minDistance = intersections[x][y]
+				}
+			}
+		}
+	}
+
+	return minDistance
 }

@@ -27,7 +27,13 @@ func main() {
 	w1.AddSegments(strings.Split(line1, ","))
 	w2.AddSegments(strings.Split(line2, ","))
 
-	distance := wires.ClosestIntersectionDistance(w1.GetIntersections(w2))
+	intersections := w1.GetIntersections(w2)
+
+	distance := wires.ClosestIntersectionManhattan(intersections)
 
 	fmt.Printf("Closest intersection to port = %d\n", distance)
+
+	distance2 := wires.ClosestIntersectionLinear(intersections)
+
+	fmt.Printf("Closest intersections along wires = %d\n", distance2)
 }

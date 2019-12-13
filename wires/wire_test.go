@@ -17,7 +17,6 @@ func TestAddSegment(t *testing.T) {
 		y      int
 		expect bool
 	}{
-		{0, 0, true},
 		{1, 0, true},
 		{2, 0, true},
 		{3, 0, false},
@@ -51,8 +50,8 @@ func TestGetIntersections(t *testing.T) {
 
 	got := w1.GetIntersections(w2)
 	expect := map[int]map[int]int{
-		0: {0: 1},
-		5: {2: 1, 3: 1},
+		0: {0: 0},
+		5: {2: 14, 3: 18},
 	}
 
 	if !reflect.DeepEqual(got, expect) {
@@ -81,7 +80,7 @@ func TestparseSegment(t *testing.T) {
 	}
 }
 
-func TestClosestIntersectionDistance(t *testing.T) {
+func TestClosestIntersectionManhattan(t *testing.T) {
 	table := []struct {
 		w1     []string
 		w2     []string
@@ -105,9 +104,40 @@ func TestClosestIntersectionDistance(t *testing.T) {
 		w1.AddSegments(c.w1)
 		w2.AddSegments(c.w2)
 		intersections := w1.GetIntersections(w2)
-		got := ClosestIntersectionDistance(intersections)
+		got := ClosestIntersectionManhattan(intersections)
 		if c.expect != got {
 			t.Errorf("Did not get expected closest intersection. got: %d, expected: %d\n", got, c.expect)
+		}
+	}
+}
+
+func TestClosestIntersectionLinear(t *testing.T) {
+	table := []struct {
+		w1     []string
+		w2     []string
+		expect int
+	}{
+		{
+			[]string{"R75", "D30", "R83", "U83", "L12", "D49", "R71", "U7", "L72"},
+			[]string{"U62", "R66", "U55", "R34", "D71", "R55", "D58", "R83"},
+			610,
+		},
+		{
+			[]string{"R98", "U47", "R26", "D63", "R33", "U87", "L62", "D20", "R33", "U53", "R51"},
+			[]string{"U98", "R91", "D20", "R16", "D67", "R40", "U7", "R15", "U6", "R7"},
+			410,
+		},
+	}
+
+	for _, c := range table {
+		w1 := New()
+		w2 := New()
+
+		w1.AddSegments(c.w1)
+		w2.AddSegments(c.w2)
+
+		if got := ClosestIntersectionLinear(w1.GetIntersections(w2)); got != c.expect {
+			t.Errorf("Expected linear intersection distance of %d, got %d\n", c.expect, got)
 		}
 	}
 }

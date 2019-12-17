@@ -40,3 +40,23 @@ func HasIncreasingDigits(x int) bool {
 
 	return true
 }
+
+func HasExactDouble(x int) bool {
+	s := strconv.Itoa(x)
+	hasDouble := false
+	var lastDoubleChar byte
+	if len(s) < 2 {
+		return false
+	}
+	for i := 1; i < len(s); i++ {
+		if s[i] == s[i-1] {
+			if s[i] == lastDoubleChar {
+				hasDouble = false
+			} else {
+				hasDouble = true
+				lastDoubleChar = s[i]
+			}
+		}
+	}
+	return hasDouble
+}

@@ -63,3 +63,30 @@ func TestHasIncreasingDigits(t *testing.T) {
 		}
 	}
 }
+
+func TestHasExactDouble(t *testing.T) {
+	table := []struct {
+		in     int
+		expect bool
+	}{
+		{11, true},
+		{1, false},
+		{12, false},
+		{1123, true},
+		{1233, true},
+		{122213, false},
+		{1112223, false},
+		{123444, false},
+		{112233, true},
+		{112133, true},
+		{122344, true},
+		{11223344, true},
+		{788999, true},
+	}
+
+	for _, c := range table {
+		if got := HasExactDouble(c.in); got != c.expect {
+			t.Errorf("HasExactDouble(%d) returned %t, expected %t\n", c.in, got, c.expect)
+		}
+	}
+}

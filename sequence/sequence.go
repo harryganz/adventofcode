@@ -43,20 +43,24 @@ func HasIncreasingDigits(x int) bool {
 
 func HasExactDouble(x int) bool {
 	s := strconv.Itoa(x)
-	hasDouble := false
-	var lastDoubleChar byte
-	if len(s) < 2 {
-		return false
-	}
+
+	nextToMap := make(map[byte]int)
+
 	for i := 1; i < len(s); i++ {
 		if s[i] == s[i-1] {
-			if s[i] == lastDoubleChar {
-				hasDouble = false
+			if v, ok := nextToMap[s[i]]; ok {
+				nextToMap[s[i]] = v + 1
 			} else {
-				hasDouble = true
-				lastDoubleChar = s[i]
+				nextToMap[s[i]] = 2
 			}
 		}
 	}
-	return hasDouble
+
+	for _, v := range nextToMap {
+		if v == 2 {
+			return true
+		}
+	}
+
+	return false
 }

@@ -26,3 +26,22 @@ func TestRunProgram(t *testing.T) {
 		}
 	}
 }
+
+func TestParseInstruction(t *testing.T) {
+	table := []struct {
+		in     int
+		expect []int
+	}{
+		{2, []int{2, 0, 0, 0}},
+		{11, []int{11, 0, 0, 0}},
+		{101, []int{1, 0, 0, 1}},
+		{1102, []int{2, 0, 1, 1}},
+		{10003, []int{3, 1, 0, 0}},
+	}
+
+	for _, c := range table {
+		if got := parseInstruction(c.in); !reflect.DeepEqual(got, c.expect) {
+			t.Errorf("parstInstruction(%d). got: %v, expected: %v\n", c.in, got, c.expect)
+		}
+	}
+}

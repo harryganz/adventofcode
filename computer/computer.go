@@ -19,12 +19,23 @@ func RunProgram(input []int) ([]int, error) {
 }
 
 func execute(input, instruction, params []int) error {
+	paramValues := make([]int, 3)
+	// Populate paramValues based on parameter mode
+	for i := 0; i < len(params); i++ {
+		switch mode := instruction[i+1]; mode {
+		case 0:
+			paramValues[i] = input[params[i]]
+		case 1:
+			paramValues[i] = params[i]
+		}
+	}
+
 	switch opcode := instruction[0]; opcode {
 	case 1:
-		x1, x2 := input[params[0]], input[params[1]]
+		x1, x2 := paramValues[0], paramValues[1]
 		input[params[2]] = x1 + x2
 	case 2:
-		x1, x2 := input[params[0]], input[params[1]]
+		x1, x2 := paramValues[0], paramValues[1]
 		input[params[2]] = x1 * x2
 	default:
 		return errors.New("Unknown opcode")

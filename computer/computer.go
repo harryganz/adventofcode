@@ -1,17 +1,21 @@
 package computer
 
-import "errors"
+import (
+	"errors"
+)
 
 func RunProgram(input []int) ([]int, error) {
-	for pos := 0; pos < len(input) && input[pos] != 99; pos += 4 {
-		instruction := parseInstruction(input[pos])
-		err := execute(input, instruction, input[pos+1:pos+4])
+	output := make([]int, len(input))
+	copy(output, input)
+	for pos := 0; pos < len(output) && output[pos] != 99; pos += 4 {
+		instruction := parseInstruction(output[pos])
+		err := execute(output, instruction, output[pos+1:pos+4])
 		if err != nil {
-			return input, err
+			return output, err
 		}
 	}
 
-	return input, nil
+	return output, nil
 }
 
 func execute(input, instruction, params []int) error {

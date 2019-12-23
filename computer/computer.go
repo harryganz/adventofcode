@@ -7,9 +7,12 @@ import (
 func RunProgram(input []int) ([]int, error) {
 	output := make([]int, len(input))
 	copy(output, input)
-	for pos := 0; pos < len(output) && output[pos] != 99; pos += 4 {
+	var err error
+	var register int
+	var advance int
+	for pos := 0; pos < len(output) && output[pos] != 99; pos += advance {
 		instruction := parseInstruction(output[pos])
-		err := execute(output, instruction, output[pos+1:pos+4])
+		register, advance, err = execute(output, instruction, output[pos+1:pos+4], register)
 		if err != nil {
 			return output, err
 		}
@@ -18,7 +21,7 @@ func RunProgram(input []int) ([]int, error) {
 	return output, nil
 }
 
-func execute(input, instruction, params []int) error {
+func execute(input, instruction, params []int, register int) (int, int, error) {
 	paramValues := make([]int, 3)
 	// Populate paramValues based on parameter mode
 	for i := 0; i < len(params); i++ {
@@ -33,15 +36,17 @@ func execute(input, instruction, params []int) error {
 	switch opcode := instruction[0]; opcode {
 	case 1:
 		x1, x2 := paramValues[0], paramValues[1]
-		input[params[2]] = x1 + x2
+		value := x1 + x2
+		input[params[2]] = value
+		return value, 4, nil
 	case 2:
 		x1, x2 := paramValues[0], paramValues[1]
-		input[params[2]] = x1 * x2
+		value := x1 * x2
+		input[params[2]] = value
+		return value, 4, nil
 	default:
-		return errors.New("Unknown opcode")
+		return 0, 0, errors.New("Unknown opcode")
 	}
-
-	return nil
 }
 
 func parseInstruction(instruction int) []int {

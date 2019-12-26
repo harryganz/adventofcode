@@ -12,7 +12,12 @@ func RunProgram(input []int) ([]int, error) {
 	var advance int
 	for pos := 0; pos < len(output) && output[pos] != 99; pos += advance {
 		instruction := parseInstruction(output[pos])
-		register, advance, err = execute(output, instruction, output[pos+1:pos+4], register)
+		if instruction[0] == 3 || instruction[0] == 4 {
+			advance = 2
+		} else {
+			advance = 4
+		}
+		register, advance, err = execute(output, instruction, output[pos+1:pos+advance], register)
 		if err != nil {
 			return output, err
 		}
@@ -38,12 +43,18 @@ func execute(input, instruction, params []int, register int) (int, int, error) {
 		x1, x2 := paramValues[0], paramValues[1]
 		value := x1 + x2
 		input[params[2]] = value
-		return value, 4, nil
+		return register, 4, nil
 	case 2:
 		x1, x2 := paramValues[0], paramValues[1]
 		value := x1 * x2
 		input[params[2]] = value
-		return value, 4, nil
+		return register, 4, nil
+	case 3:
+		value := paramValues[0]
+		return value, 2, nil
+	case 4:
+		input[params[0]] = register
+		return register, 2, nil
 	default:
 		return 0, 0, errors.New("Unknown opcode")
 	}

@@ -1,11 +1,14 @@
 package computer
 
 import (
+	"bufio"
 	"reflect"
+	"strings"
 	"testing"
 )
 
 func TestRunProgram(t *testing.T) {
+	defaultReader = bufio.NewReader(strings.NewReader("1\r\n"))
 	table := []struct {
 		input  []int
 		output []int
@@ -13,10 +16,7 @@ func TestRunProgram(t *testing.T) {
 		{[]int{1, 0, 0, 0, 99}, []int{2, 0, 0, 0, 99}},
 		{[]int{2, 3, 0, 3, 99}, []int{2, 3, 0, 6, 99}},
 		{[]int{2, 4, 4, 5, 99, 0}, []int{2, 4, 4, 5, 99, 9801}},
-		{[]int{1, 1, 1, 4, 99, 5, 6, 0, 99}, []int{30, 1, 1, 4, 2, 5, 6, 0, 99}},
-		{[]int{3, 5, 4, 0, 99, -1}, []int{-1, 5, 4, 0, 99, -1}},
-		{[]int{10003, 5, 4, 0, 99}, []int{5, 5, 4, 0, 99}},
-		{[]int{3, 0, 4, 0, 99}, []int{3, 0, 4, 0, 99}},
+		{[]int{3, 0, 4, 0, 99}, []int{1, 0, 4, 0, 99}},
 	}
 
 	for _, c := range table {

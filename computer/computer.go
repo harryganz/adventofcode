@@ -1,18 +1,24 @@
 package computer
 
 import (
+	"bufio"
 	"errors"
+	"os"
+	"regexp"
+	"strconv"
 )
+
+var defaultReader *bufio.Reader = bufio.NewReader(os.Stdin)
+var defaultWriter *bufio.Writer = bufio.NewWriter(os.Stdout)
 
 func RunProgram(input []int) ([]int, error) {
 	output := make([]int, len(input))
 	copy(output, input)
 	var err error
-	var register int
 	var advance int
 	for pos := 0; pos < len(output) && output[pos] != 99; pos += advance {
 		instruction := parseInstruction(output[pos])
-		register, advance, err = execute(output, instruction, pos, register)
+		advance, err = execute(output, instruction, pos)
 		if err != nil {
 			return output, err
 		}
@@ -21,7 +27,7 @@ func RunProgram(input []int) ([]int, error) {
 	return output, nil
 }
 
-func execute(input, instruction []int, pos, register int) (int, int, error) {
+func execute(input, instruction []int, pos int) (int, error) {
 	paramModes := instruction[1:]
 	getParam := paramGetter(pos, input, paramModes)
 
@@ -29,19 +35,31 @@ func execute(input, instruction []int, pos, register int) (int, int, error) {
 	case 1:
 		x1, x2 := getParam(0), getParam(1)
 		input[input[pos+3]] = x1 + x2
-		return register, 4, nil
+		return 4, nil
 	case 2:
 		x1, x2 := getParam(0), getParam(1)
 		input[input[pos+3]] = x1 * x2
-		return register, 4, nil
+		return 4, nil
 	case 3:
-		value := getParam(0)
-		return value, 2, nil
+		s, err := defaultReader.ReadString('\n')
+		if err != nil {
+			return 2, err
+		}
+		value, err := strconv.Atoi(trimEndline(s))
+		if err != nil {
+			return 2, err
+		}
+		input[input[pos+1]] = value
+		return 2, nil
 	case 4:
-		input[input[pos+1]] = register
-		return register, 2, nil
+		value := getParam(0)
+		_, err := defaultWriter.WriteString(strconv.Itoa(value))
+		if err != nil {
+			return 2, err
+		}
+		return 2, nil
 	default:
-		return 0, 0, errors.New("Unknown opcode")
+		return 0, errors.New("Unknown opcode")
 	}
 }
 
@@ -62,4 +80,9 @@ func paramGetter(pos int, input []int, mode []int) func(int) int {
 			return input[pos+index+1]
 		}
 	}
+}
+
+func trimEndline(s string) string {
+	rg := regexp.MustCompile("\r?\n")
+	return rg.ReplaceAllString(s, "")
 }
